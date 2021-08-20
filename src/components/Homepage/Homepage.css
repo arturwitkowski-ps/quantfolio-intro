@@ -1,0 +1,101 @@
+.introProject {
+  max-width: 800px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+header img {
+  width: 60%;
+}
+
+.chart {
+  position: relative;
+  background-image: linear-gradient(
+    90deg,
+    #222e35 25%,
+    #26343b 25%,
+    #26343b 50%,
+    #222e35 50%,
+    #222e35 75%,
+    #26343b 75%,
+    #26343b 100%
+  );
+
+  background-size: 200px 200px;
+}
+
+.legend {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 15px;
+}
+
+.legend .legend-stock {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.legend-text {
+  color: black;
+  transition: color 0.2s;
+}
+
+.stocks {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid black;
+}
+
+td {
+  border-right: 2px solid black;
+  border-left: 2px solid black;
+  padding: 5px 10px;
+}
+
+td:nth-child(1) {
+  width: 70px;
+  height: 20px;
+  position: relative;
+}
+
+thead {
+  background-color: #b6b5b5;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #d4d3d3;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #e7e7e7;
+}
+
+.stock-circle {
+  margin: 0 auto;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.legend-stock--hidden .stock-circle {
+  background-color: #c9c9c9 !important;
+}
+
+.legend-stock--hidden .legend-text {
+  color: #c9c9c9 !important;
+}
