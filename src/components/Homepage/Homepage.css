@@ -30,6 +30,37 @@ header img {
   background-size: 200px 200px;
 }
 
+.currency {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 10px;
+  right: 10px;
+  gap: 5px;
+}
+
+.currency .currency-button {
+  width: 44px;
+  height: 22px;
+  border-radius: 2px;
+  color: black;
+  background-color: white;
+  font-size: 13px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.currency .currency-button--selected {
+  font-weight: 600;
+  cursor: auto;
+}
+
 .legend {
   display: flex;
   justify-content: space-between;
@@ -39,10 +70,14 @@ header img {
 
 .legend .legend-stock {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
   cursor: pointer;
   user-select: none;
+  margin: 0 10px;
+  text-align: center;
+  min-height: 70px;
 }
 
 .legend-text {
@@ -98,4 +133,11 @@ tbody tr:nth-child(even) {
 
 .legend-stock--hidden .legend-text {
   color: #c9c9c9 !important;
+}
+
+.loading {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 20px;
 }

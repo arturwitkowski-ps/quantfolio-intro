@@ -1,126 +1,66 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Highcharts from 'highcharts/highstock';
 import HighchartsReact from 'highcharts-react-official';
 
 import Logo from '../../images/logo-bright.png';
+import { getStocksData, getStocks } from '../../utility/api';
+import { createHighchartsConfig, stockColors, stockCurrencies } from '../../utility/charts-config';
+
 import './Homepage.css';
-import exampleData from './example-data';
-
-const stockColors = [
-  'red',
-  'yellow',
-  'green',
-  'royalblue',
-  'aqua',
-  'hotpink',
-  'darkblue',
-];
-
-const defaultHighchartsOptions = {
-  series: [
-    {
-      data: exampleData,
-    },
-  ],
-  plotOptions: {
-    series: {
-      type: 'ohlc',
-    },
-  },
-  chart: {
-    backgroundColor: 'transparent',
-    style: {
-      color: '#FFF',
-    },
-  },
-  xAxis: {
-    labels: {
-      style: {
-        color: '#FFF',
-      },
-    },
-    title: {
-      style: {
-        color: '#FFF',
-      },
-    },
-  },
-  yAxis: {
-    lineColor: '#DDD',
-    labels: {
-      style: {
-        color: '#FFF',
-      },
-    },
-    title: {
-      style: {
-        color: '#FFF',
-      },
-    },
-  },
-  navigator: {
-    enabled: false,
-  },
-  credits: {
-    enabled: false,
-  },
-  rangeSelector: {
-    inputEnabled: false,
-    allButtonsEnabled: true,
-    labelStyle: {
-      color: 'white',
-    },
-    buttons: [
-      {
-        type: 'year',
-        count: 1,
-        text: '1Y',
-        dataGrouping: {
-          forced: true,
-          units: [['day', [1]]],
-        },
-      },
-      {
-        type: 'year',
-        count: 5,
-        text: '5Y',
-        dataGrouping: {
-          forced: true,
-          units: [['day', [1]]],
-        },
-      },
-      {
-        type: 'all',
-        text: 'MAX',
-        dataGrouping: {
-          forced: true,
-          units: [['day', [1]]],
-        },
-      },
-    ],
-    buttonTheme: {
-      width: 40,
-    },
-    selected: 1,
-  },
-};
 
 const Homepage = () => {
   const chartComponent = useRef(null);
-  const [selectedStocks, setSelectedStocks] = useState([1]);
+  const [selectedStocks, setSelectedStocks] = useState([]);
+  const [stocksInfo, setStocksInfo] = useState();
+  const [selectedCurrency, setSelectedCurrency] = useState(stockCurrencies.USD);
+  const [highchartsConfig, setHighchartsConfig] = useState(createHighchartsConfig());
 
-  const toggleStock = (index) => {
-    if (isNaN(index)) return;
+  const loadStocks = useCallback((pickedStocks, pickedCurrency) => {
+    console.log('load')
+    if (!stocksInfo) return;
+    chartComponent.current.chart.showLoading();
 
+    getStocks(pickedStocks, pickedCurrency, stocksInfo)
+      .then((stockSeries) => {
+        console.log('loadeded')
+        setHighchartsConfig(createHighchartsConfig(stockSeries));
+      })
+      .catch(err => console.log(err))
+      .finally(() => 
+        chartComponent.current.chart.hideLoading()
+      );
+  }, [stocksInfo]);
+
+  useEffect(() => {
+    getStocksData()
+      .then(data => data.json())
+      .then((fetchedStocksData) => {
+        fetchedStocksData = fetchedStocksData.filter(stockDataElement => stockDataElement.type === 'Common Stack')
+        fetchedStocksData.sort((a, b) => a.id > b.id)
+        setStocksInfo(fetchedStocksData)
+      })
+      .catch(err => console.log(err))
+  }, []);
+
+  const changeCurrency = (currency) => {
+    setSelectedCurrency(currency);
+    loadStocks(selectedStocks, currency);
+  }
+
+  const toggleStock = (stockSymbol) => {
     setSelectedStocks((oldSelectedStocks) => {
-      const position = oldSelectedStocks.indexOf(index);
+      const position = oldSelectedStocks.indexOf(stockSymbol);
+      const newSelectedStocks = [...oldSelectedStocks];
+      
       if (position !== -1) {
-        const newSelectedStocks = [...oldSelectedStocks];
         newSelectedStocks.splice(position, 1);
-        return newSelectedStocks;
       } else {
-        return [...oldSelectedStocks, index];
+        newSelectedStocks.push(stockSymbol);
       }
+
+
+      loadStocks(newSelectedStocks, selectedCurrency)
+      return newSelectedStocks;
     });
   };
 
@@ -134,26 +74,35 @@ const Homepage = () => {
           <HighchartsReact
             highcharts={Highcharts}
             constructorType={'stockChart'}
-            options={defaultHighchartsOptions}
+            options={highchartsConfig}
             ref={chartComponent}
           />
+          <div className="currency">
+            {Object.values(stockCurrencies).map(curr => (
+              <div 
+                key={curr}
+                className={`currency-button${selectedCurrency === curr ? ' currency-button--selected': ''}`}
+                onClick={() => changeCurrency(curr)}
+              >{curr}</div>
+            ))}
+          </div>
         </section>
         <section className="legend">
-          {[1, 2, 3, 4, 5, 6, 7].map((index) => (
+        {stocksInfo ? stocksInfo.map(({ name, id, symbol }) => (
             <div
-              key={`stockLegend-${index}`}
+              key={`stockLegend-${id}`}
               className={`legend-stock${
-                !selectedStocks.includes(index) ? ' legend-stock--hidden' : ''
+                !selectedStocks.includes(symbol) ? ' legend-stock--hidden' : ''
               }`}
-              onClick={() => toggleStock(index)}
+              onClick={() => toggleStock(symbol)}
             >
               <div
                 className="stock-circle"
-                style={{ backgroundColor: stockColors[index - 1] }}
+                style={{ backgroundColor: stockColors[id] }}
               ></div>
-              <div className="legend-text">Stock {index}</div>
+              <div className="legend-text">{name}</div>
             </div>
-          ))}
+          )) : <div className="loading"><h3>Loading...</h3></div>}
         </section>
         <section className="stocks">
           <table>
@@ -166,21 +115,22 @@ const Homepage = () => {
               </tr>
             </thead>
             <tbody>
-              {[1, 2, 3, 4, 5, 6, 7].map((index) => (
-                <tr key={`stockTable-${index}`}>
+              {stocksInfo ? stocksInfo.map(({ name, max, id }) => (
+                <tr key={`stockTable-${id}`}>
                   <td>
                     <div
                       className="stock-circle"
-                      style={{ backgroundColor: stockColors[index - 1] }}
+                      style={{ backgroundColor: stockColors[id] }}
                     ></div>
                   </td>
-                  <td>Stock {index}</td>
-                  <td>xx</td>
-                  <td>xx</td>
+                  <td>{name}</td>
+                  <td>{`${max.cagr}%`}</td>
+                  <td>{max.sharpe}</td>
                 </tr>
-              ))}
+              )) : null}
             </tbody>
           </table>
+          {!stocksInfo ? <div className="loading"><h3>Loading...</h3></div> : ''}
         </section>
       </main>
     </div>
