@@ -70,7 +70,6 @@ const Homepage = () => {
   
     useEffect(() => {
       getStocksData()
-        .then(data => data.json())
         .then((fetchedStocksData) => {
           fetchedStocksData.sort((a, b) => a.id > b.id)
           setStocksInfo(fetchedStocksData)

@@ -68,10 +68,18 @@ header img {
   margin: 20px 15px;
 }
 
+@media screen and (max-width: 600px) {
+  .legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: center;
+  }
+}
+
 .legend .legend-stock {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   cursor: pointer;
   user-select: none;

@@ -14,8 +14,36 @@ const stockColors = [
   'darkblue',
 ];
 
-const createHighchartsConfig = (seriesData, handleZoom = () => {}) => ({
-    series: seriesData ?? [],
+const createSeriesFromData = (selectedStocks, stocksInfo) => {
+  const stockSeries = [];
+  selectedStocks.forEach(oneDay => {
+    const newStockRecord = [
+      (new Date(oneDay.recorded)).getTime(),
+      oneDay.open,
+      oneDay.high,
+      oneDay.low,
+      oneDay.close,
+    ];
+
+    if (oneDay.stock_id in stockSeries) {
+      stockSeries[oneDay.stock_id].data.push(newStockRecord)
+    } else {
+      const stockName = stocksInfo.find(searchedStock => searchedStock.id === oneDay.stock_id);
+
+      stockSeries[oneDay.stock_id] = {
+        data: [newStockRecord],
+        name: stockName.name,
+        color: stockColors[oneDay.stock_id - 1],
+        turboThreshold: 20000
+      };
+    }
+  })
+
+  return stockSeries;
+}
+
+const createHighchartsConfig = (seriesData = [], handleZoom = () => {}) => ({
+    series: seriesData,
     chart: {
       type: 'ohlc',
       backgroundColor: 'transparent',
@@ -109,4 +137,5 @@ export {
   createHighchartsConfig,
   stockColors,
   stockCurrencies,
+  createSeriesFromData,
 }
