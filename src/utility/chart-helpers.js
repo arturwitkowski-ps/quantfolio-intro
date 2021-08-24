@@ -39,7 +39,7 @@ const createSeriesFromData = (selectedStocks, stocksInfo) => {
     }
   })
 
-  return stockSeries;
+  return stockSeries
 }
 
 const createHighchartsConfig = (seriesData = [], handleZoom = () => {}) => ({

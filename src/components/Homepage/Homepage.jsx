@@ -4,7 +4,7 @@ import HighchartsReact from 'highcharts-react-official';
 
 import Logo from '../../images/logo-bright.png';
 import { getStocksData, getStocks } from '../../utility/api';
-import { createHighchartsConfig, stockColors, stockCurrencies } from '../../utility/charts-config';
+import { createHighchartsConfig, stockColors, stockCurrencies } from '../../utility/chart-helpers';
 
 import './Homepage.css';
 
@@ -45,7 +45,6 @@ const Homepage = () => {
       } else {
         newSelectedStocks.push(stockSymbol);
       }
-      
       
       loadStocks(newSelectedStocks, selectedCurrency)
       return newSelectedStocks;

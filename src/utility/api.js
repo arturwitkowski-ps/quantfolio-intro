@@ -1,4 +1,4 @@
-import { createSeriesFromData } from "./charts-config";
+import { createSeriesFromData } from "./chart-helpers";
 
 const API_URL = "http://vps-a4acc035.vps.ovh.net:8000";
 
