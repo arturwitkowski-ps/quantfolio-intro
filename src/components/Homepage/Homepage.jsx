@@ -14,39 +14,27 @@ const Homepage = () => {
   const [stocksInfo, setStocksInfo] = useState();
   const [selectedCurrency, setSelectedCurrency] = useState(stockCurrencies.USD);
   const [highchartsConfig, setHighchartsConfig] = useState(createHighchartsConfig());
+  const [zoom, setZoom] = useState('1y');
 
   const loadStocks = useCallback((pickedStocks, pickedCurrency) => {
-    console.log('load')
     if (!stocksInfo) return;
     chartComponent.current.chart.showLoading();
 
     getStocks(pickedStocks, pickedCurrency, stocksInfo)
       .then((stockSeries) => {
-        console.log('loadeded')
-        setHighchartsConfig(createHighchartsConfig(stockSeries));
+        setHighchartsConfig(createHighchartsConfig(stockSeries, setZoom));
       })
       .catch(err => console.log(err))
       .finally(() => 
         chartComponent.current.chart.hideLoading()
       );
   }, [stocksInfo]);
-
-  useEffect(() => {
-    getStocksData()
-      .then(data => data.json())
-      .then((fetchedStocksData) => {
-        fetchedStocksData = fetchedStocksData.filter(stockDataElement => stockDataElement.type === 'Common Stack')
-        fetchedStocksData.sort((a, b) => a.id > b.id)
-        setStocksInfo(fetchedStocksData)
-      })
-      .catch(err => console.log(err))
-  }, []);
-
+  
   const changeCurrency = (currency) => {
     setSelectedCurrency(currency);
     loadStocks(selectedStocks, currency);
   }
-
+  
   const toggleStock = (stockSymbol) => {
     setSelectedStocks((oldSelectedStocks) => {
       const position = oldSelectedStocks.indexOf(stockSymbol);
@@ -57,13 +45,41 @@ const Homepage = () => {
       } else {
         newSelectedStocks.push(stockSymbol);
       }
-
-
+      
+      
       loadStocks(newSelectedStocks, selectedCurrency)
       return newSelectedStocks;
     });
   };
-
+  
+  const highlightStock = (stockName, newState) => {
+    if (selectedStocks.length === 0) return;
+    const foundStock = chartComponent.current.chart.series.find(series => series.name === stockName);
+    const restOfStocks = chartComponent.current.chart.series.filter(series => series.name !== stockName)
+    
+    if(!foundStock) return;
+    foundStock.points.forEach(point => {
+      point.setState(newState)
+    });
+    if (newState === 'hover') {
+      restOfStocks.forEach(stock => stock.points.forEach(point => point.setState('inactive')))
+    } else {
+      restOfStocks.forEach(stock => stock.points.forEach(point => point.setState('normal')));
+    }
+  }
+  
+    useEffect(() => {
+      getStocksData()
+        .then(data => data.json())
+        .then((fetchedStocksData) => {
+          fetchedStocksData.sort((a, b) => a.id > b.id)
+          setStocksInfo(fetchedStocksData)
+        })
+        .catch(err => console.log(err))
+  
+      
+    }, []);
+  
   return (
     <div className="introProject">
       <header>
@@ -95,10 +111,12 @@ const Homepage = () => {
                 !selectedStocks.includes(symbol) ? ' legend-stock--hidden' : ''
               }`}
               onClick={() => toggleStock(symbol)}
+              onMouseEnter={() => highlightStock(name, 'hover')}
+              onMouseLeave={() => highlightStock(name, 'normal')}
             >
               <div
                 className="stock-circle"
-                style={{ backgroundColor: stockColors[id] }}
+                style={{ backgroundColor: stockColors[id - 1] }}
               ></div>
               <div className="legend-text">{name}</div>
             </div>
@@ -115,17 +133,17 @@ const Homepage = () => {
               </tr>
             </thead>
             <tbody>
-              {stocksInfo ? stocksInfo.map(({ name, max, id }) => (
-                <tr key={`stockTable-${id}`}>
+              {stocksInfo ? stocksInfo.map((stock) => (
+                <tr key={`stockTable-${stock.id}`}>
                   <td>
                     <div
                       className="stock-circle"
-                      style={{ backgroundColor: stockColors[id] }}
+                      style={{ backgroundColor: stockColors[stock.id - 1] }}
                     ></div>
                   </td>
-                  <td>{name}</td>
-                  <td>{`${max.cagr}%`}</td>
-                  <td>{max.sharpe}</td>
+                  <td>{stock.name}</td>
+                  <td>{`${stock[zoom].cagr}%`}</td>
+                  <td>{stock[zoom].sharpe}</td>
                 </tr>
               )) : null}
             </tbody>

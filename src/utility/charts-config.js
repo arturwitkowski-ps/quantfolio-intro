@@ -1,5 +1,3 @@
-const stockSymbols = ['', 'VTVT', 'LOB', 'NTRA', 'OLLI', 'RUN', 'CNFR', 'RPD'];
-
 const stockCurrencies = {
   EUR: 'EUR',
   NOK: 'NOK',
@@ -7,7 +5,6 @@ const stockCurrencies = {
 };
 
 const stockColors = [
-  '',
   'red',
   'yellow',
   'green',
@@ -17,7 +14,7 @@ const stockColors = [
   'darkblue',
 ];
 
-const createHighchartsConfig = (seriesData) => ({
+const createHighchartsConfig = (seriesData, handleZoom = () => {}) => ({
     series: seriesData ?? [],
     chart: {
       type: 'ohlc',
@@ -74,6 +71,9 @@ const createHighchartsConfig = (seriesData) => ({
           dataGrouping: {
             units: [['day', [1]]],
           },
+          events: {
+            click: () => handleZoom('1y')
+          }
         },
         {
           type: 'year',
@@ -82,6 +82,9 @@ const createHighchartsConfig = (seriesData) => ({
           dataGrouping: {
             units: [['day', [1]]],
           },
+          events: {
+            click: () => handleZoom('5y')
+          }
         },
         {
           type: 'all',
@@ -89,6 +92,9 @@ const createHighchartsConfig = (seriesData) => ({
           dataGrouping: {
             units: [['day', [1]]],
           },
+          events: {
+            click: () => handleZoom('max')
+          }
         },
       ],
       buttonTheme: {
@@ -102,6 +108,5 @@ const createHighchartsConfig = (seriesData) => ({
 export {
   createHighchartsConfig,
   stockColors,
-  stockSymbols,
   stockCurrencies,
 }
