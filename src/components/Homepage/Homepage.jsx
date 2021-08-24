@@ -42,6 +42,7 @@ const Homepage = () => {
   }
 
   const changeCurrency = (currency) => {
+    if (isLoading) return;
     setSelectedCurrency(currency);
     loadStocks(selectedStocks, currency);
   }
