@@ -1,0 +1,33 @@
+.stocks {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid black;
+}
+
+td {
+  border-right: 2px solid black;
+  border-left: 2px solid black;
+  padding: 5px 10px;
+}
+
+td:nth-child(1) {
+  width: 70px;
+  height: 20px;
+  position: relative;
+}
+
+thead {
+  background-color: #b6b5b5;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #d4d3d3;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #e7e7e7;
+}

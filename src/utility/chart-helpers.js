@@ -37,7 +37,6 @@ const createSeriesFromData = (selectedStocks, stocksInfo) => {
         color: stockColors[oneDay.stock_id - 1],
         turboThreshold: 20000,
         _id: oneDay.stock_id,
-        _show: true
       });
     }
   })
