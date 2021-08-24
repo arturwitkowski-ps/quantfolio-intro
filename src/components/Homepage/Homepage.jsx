@@ -12,17 +12,18 @@ const Homepage = () => {
   const chartComponent = useRef(null);
   const [selectedStocks, setSelectedStocks] = useState([]);
   const [stocksInfo, setStocksInfo] = useState();
-  const [selectedCurrency, setSelectedCurrency] = useState(stockCurrencies.USD);
-  const [highchartsConfig, setHighchartsConfig] = useState(createHighchartsConfig());
   const [zoom, setZoom] = useState('1y');
+  const [selectedCurrency, setSelectedCurrency] = useState(stockCurrencies.USD);
+  const [highchartsConfig, setHighchartsConfig] = useState(createHighchartsConfig(setZoom));
 
   const loadStocks = useCallback((pickedStocks, pickedCurrency) => {
     if (!stocksInfo) return;
     chartComponent.current.chart.showLoading();
 
+    // const stocksToFetch = pickedStocks.filter(())
     getStocks(pickedStocks, pickedCurrency, stocksInfo)
       .then((stockSeries) => {
-        setHighchartsConfig(createHighchartsConfig(stockSeries, setZoom));
+        setHighchartsConfig(config => ({ series: stockSeries }));
       })
       .catch(err => console.log(err))
       .finally(() => 
@@ -73,9 +74,7 @@ const Homepage = () => {
           fetchedStocksData.sort((a, b) => a.id > b.id)
           setStocksInfo(fetchedStocksData)
         })
-        .catch(err => console.log(err))
-  
-      
+        .catch(err => console.log(err));
     }, []);
   
   return (

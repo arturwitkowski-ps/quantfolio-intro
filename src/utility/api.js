@@ -1,6 +1,6 @@
 import { createSeriesFromData } from "./chart-helpers";
 
-const API_URL = "http://vps-a4acc035.vps.ovh.net:8000";
+const API_URL = "https://apps.lukaszpiotrkowski.pl/stockapp/";
 
 const getStocksData = () => fetch(`${API_URL}/stocks?period=1,5,max`).then(data => data.json());
 

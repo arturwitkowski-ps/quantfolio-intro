@@ -25,25 +25,28 @@ const createSeriesFromData = (selectedStocks, stocksInfo) => {
       oneDay.close,
     ];
 
-    if (oneDay.stock_id in stockSeries) {
-      stockSeries[oneDay.stock_id].data.push(newStockRecord)
+    const foundStock = stockSeries.find(stock => stock._id === oneDay.stock_id)
+    if (foundStock) {
+      foundStock.data.push(newStockRecord)
     } else {
       const stockName = stocksInfo.find(searchedStock => searchedStock.id === oneDay.stock_id);
 
-      stockSeries[oneDay.stock_id] = {
+      stockSeries.push({
         data: [newStockRecord],
         name: stockName.name,
         color: stockColors[oneDay.stock_id - 1],
-        turboThreshold: 20000
-      };
+        turboThreshold: 20000,
+        _id: oneDay.stock_id,
+        _show: true
+      });
     }
   })
 
   return stockSeries
 }
 
-const createHighchartsConfig = (seriesData = [], handleZoom = () => {}) => ({
-    series: seriesData,
+const createHighchartsConfig = (handleZoom = () => {}) => ({
+    series: [],
     chart: {
       type: 'ohlc',
       backgroundColor: 'transparent',
@@ -78,6 +81,9 @@ const createHighchartsConfig = (seriesData = [], handleZoom = () => {}) => ({
           color: '#FFF',
         },
       },
+    },
+    scrollbar: {
+      enabled: false,
     },
     navigator: {
       enabled: false,
