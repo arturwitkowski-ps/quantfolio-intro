@@ -13,13 +13,14 @@ const Homepage = () => {
   const chartComponent = useRef(null);
   const [selectedStocks, setSelectedStocks] = useState([]);
   const [stocksInfo, setStocksInfo] = useState();
+  const [isLoading, setisLoading] = useState(false);
   const [zoom, setZoom] = useState('1y');
   const [selectedCurrency, setSelectedCurrency] = useState(stockCurrencies.USD);
   const [highchartsConfig, setHighchartsConfig] = useState(createHighchartsConfig(setZoom));
 
   const loadStocks = useCallback((pickedStocks, pickedCurrency) => {
     if (!stocksInfo) return;
-    chartComponent.current.chart.showLoading();
+    handleLoading(true);
 
     getStocks(pickedStocks, pickedCurrency, stocksInfo)
       .then((stockSeries) => {
@@ -27,16 +28,26 @@ const Homepage = () => {
       })
       .catch(err => console.log(err))
       .finally(() => 
-        chartComponent.current.chart.hideLoading()
+        handleLoading(false)
       );
   }, [stocksInfo]);
   
+  const handleLoading = (loadingStatus) => {
+    if (loadingStatus) {
+      chartComponent.current.chart.showLoading();
+    } else {
+      chartComponent.current.chart.hideLoading()
+    }
+    setisLoading(loadingStatus);
+  }
+
   const changeCurrency = (currency) => {
     setSelectedCurrency(currency);
     loadStocks(selectedStocks, currency);
   }
   
   const toggleStock = (stockSymbol) => {
+    if (isLoading) return;
     setSelectedStocks((oldSelectedStocks) => {
       const position = oldSelectedStocks.indexOf(stockSymbol);
       const newSelectedStocks = [...oldSelectedStocks];

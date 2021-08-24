@@ -52,6 +52,9 @@ const createHighchartsConfig = (handleZoom = () => {}) => ({
       style: {
         color: '#FFF',
       },
+      panning: {
+        enabled: false
+      }
     },
     tooltip: {
       split: false

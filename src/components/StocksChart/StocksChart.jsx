@@ -4,7 +4,20 @@ import HighchartsReact from 'highcharts-react-official';
 
 import { stockCurrencies } from '../../utility/chart-helpers';
 
-const StocksChart = ({ highchartsConfig, chartComponent, changeCurrency, selectedCurrency }) => {
+import './StocksChart.css';
+
+Highcharts.setOptions({
+  lang: {
+    rangeSelectorZoom: 'Period'
+  },
+})
+
+const StocksChart = ({ 
+  highchartsConfig, 
+  chartComponent, 
+  changeCurrency, 
+  selectedCurrency,
+}) => {
   return (
     <section className="chart">
       <HighchartsReact
