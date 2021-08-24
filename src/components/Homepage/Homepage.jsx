@@ -46,7 +46,7 @@ const Homepage = () => {
       } else {
         newSelectedStocks.push(stockSymbol);
       }
-      
+
       loadStocks(newSelectedStocks, selectedCurrency)
       return newSelectedStocks;
     });
@@ -55,17 +55,11 @@ const Homepage = () => {
   const highlightStock = (stockName, newState) => {
     if (selectedStocks.length === 0) return;
     const foundStock = chartComponent.current.chart.series.find(series => series.name === stockName);
-    const restOfStocks = chartComponent.current.chart.series.filter(series => series.name !== stockName)
-    
+
     if(!foundStock) return;
     foundStock.points.forEach(point => {
       point.setState(newState)
     });
-    if (newState === 'hover') {
-      restOfStocks.forEach(stock => stock.points.forEach(point => point.setState('inactive')))
-    } else {
-      restOfStocks.forEach(stock => stock.points.forEach(point => point.setState('normal')));
-    }
   }
   
     useEffect(() => {
